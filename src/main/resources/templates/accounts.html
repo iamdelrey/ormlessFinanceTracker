@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Счета</title>
+</head>
+<body>
+<h1>Счета</h1>
+<table>
+    <tr>
+        <th>Название</th>
+        <th>Тип</th>
+        <th>Баланс</th>
+        <th>Действия</th>
+    </tr>
+    <tr th:each="account : ${accounts}">
+        <td th:text="${account.accountName}"></td>
+        <td th:text="${account.accountType}"></td>
+        <td th:text="${account.balance}"></td>
+        <td>
+            <form method="post" action="/accounts/update">
+                <input type="hidden" name="idAccount" th:value="${account.idAccount}">
+                <input type="text" name="accountName" th:value="${account.accountName}">
+                <input type="text" name="accountType" th:value="${account.accountType}">
+                <input type="number" name="balance" th:value="${account.balance}">
+                <button type="submit">Обновить</button>
+            </form>
+            <form method="post" action="/accounts/delete">
+                <input type="hidden" name="accountId" th:value="${account.idAccount}">
+                <button type="submit">Удалить</button>
+            </form>
+        </td>
+    </tr>
+</table>
+<h2>Добавить счет</h2>
+<form method="post" action="/accounts/add">
+    <input type="text" name="accountName" placeholder="Название">
+    <input type="text" name="accountType" placeholder="Тип">
+    <input type="number" name="balance" placeholder="Баланс">
+    <button type="submit">Добавить</button>
+</form>
+</body>
+</html>

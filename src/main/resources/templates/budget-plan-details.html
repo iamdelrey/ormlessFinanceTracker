@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Детали плана бюджета</title>
+</head>
+<body>
+<h1>Детали плана бюджета</h1>
+
+<p><strong>Название:</strong> <span th:text="${budgetPlan.planName}"></span></p>
+<p><strong>Сумма:</strong> <span th:text="${budgetPlan.planAmount}"></span></p>
+<p><strong>Дата начала:</strong> <span th:text="${budgetPlan.startDate}"></span></p>
+<p><strong>Дата окончания:</strong> <span th:text="${budgetPlan.endDate}"></span></p>
+
+<h2>Детали плана</h2>
+<ul>
+    <li th:each="detail : ${detailsArray}" th:text="${detail}"></li>
+</ul>
+
+<!-- Форма для добавления новой детали плана -->
+<form th:action="@{'/budget-plans/' + ${goalId} + '/' + ${budgetPlan.idBudget} + '/details/add'}" method="post">
+    <label for="newDetail">Новая деталь:</label>
+    <input type="text" id="newDetail" name="newDetail" required>
+    <button type="submit">Добавить</button>
+</form>
+
+<h2>Категории</h2>
+<!-- Таблица для отображения категорий -->
+<table border="1">
+    <thead>
+    <tr>
+        <th>Название категории</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="category : ${categories}">
+        <td th:text="${category.categoryName}"></td>
+        <td>
+            <form th:action="@{'/budget-plans/' + ${goalId} + '/' + ${budgetPlan.idBudget} + '/delete-category'}" method="post" style="display:inline;">
+                <input type="hidden" name="idCategory" th:value="${category.idCategory}">
+                <button type="submit">Удалить</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Форма для добавления новой категории -->
+<h3>Добавить новую категорию</h3>
+<form th:action="@{'/budget-plans/' + ${goalId} + '/' + ${budgetPlan.idBudget} + '/add-category'}" method="post">
+    <label for="categoryName">Название категории:</label>
+    <input type="text" id="categoryName" name="categoryName" required>
+    <button type="submit">Добавить</button>
+</form>
+
+<a th:href="@{'/budget-plans/' + ${goalId}}">Назад к планам бюджета</a>
+</body>
+</html>

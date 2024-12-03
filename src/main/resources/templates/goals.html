@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Цели</title>
+    <script>
+        function fakeUpdate(event) {
+            event.preventDefault();
+            const rows = document.querySelectorAll("tbody tr");
+
+            rows.forEach(row => {
+                const goalNameInput = row.querySelector("input[name$='goalName']");
+                const goalAmountInput = row.querySelector("input[name$='goalAmount']");
+
+                const cells = row.querySelectorAll("td");
+                cells[0].innerText = goalNameInput.value;
+                cells[1].innerText = goalAmountInput.value;
+            });
+        }
+    </script>
+</head>
+<body>
+<h1>Ваши цели для аккаунта</h1>
+<form onsubmit="fakeUpdate(event)">
+    <table border="1">
+        <thead>
+        <tr>
+            <th>Название</th>
+            <th>Сумма</th>
+            <th>Действия</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="goal : ${goals}">
+            <td>
+                <input type="hidden" name="goals[${goal.idGoal}].idGoal" th:value="${goal.idGoal}">
+                <input type="text" name="goals[${goal.idGoal}].goalName" th:value="${goal.goalName}" required>
+            </td>
+            <td>
+                <input type="number" name="goals[${goal.idGoal}].goalAmount" th:value="${goal.goalAmount}" required>
+            </td>
+            <td>
+                <!-- Кнопка для удаления -->
+                <form th:action="@{'/goals/' + ${accountId} + '/delete'}" method="post" style="display:inline;">
+                    <input type="hidden" name="goalId" th:value="${goal.idGoal}">
+                    <button type="submit">Удалить</button>
+                </form>
+                <!-- Ссылка на планы бюджета -->
+                <a th:href="@{'/budget-plans/' + ${goal.idGoal}}">Перейти к планам бюджета</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+
+    <button type="submit">Сохранить изменения</button>
+</form>
+
+<h2>Добавить новую цель</h2>
+<form th:action="@{'/goals/' + ${accountId} + '/add'}" method="post">
+    <label for="goalName">Название:</label>
+    <input type="text" id="goalName" name="goalName" required><br>
+    <label for="goalAmount">Сумма:</label>
+    <input type="number" id="goalAmount" name="goalAmount" required><br>
+    <button type="submit">Добавить цель</button>
+</form>
+</body>
+</html>

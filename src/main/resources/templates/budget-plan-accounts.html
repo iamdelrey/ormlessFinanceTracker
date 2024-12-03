@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выбор аккаунта</title>
+</head>
+<body>
+<h1>Выберите аккаунт для работы с планами бюджета</h1>
+<ul>
+    <li th:each="account : ${accounts}">
+        <span th:text="${account.accountName}"></span>
+        <a th:href="'/budget-plans/' + ${account.idAccount}">Посмотреть план бюджета</a>
+    </li>
+</ul>
+</body>
+</html>

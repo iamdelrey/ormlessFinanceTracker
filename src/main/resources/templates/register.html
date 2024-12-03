@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+</head>
+<body>
+<div style="text-align: center; margin-top: 50px;">
+    <h1>Регистрация</h1>
+    <!-- Сообщение об успешной регистрации -->
+    <div style="color: green; margin-bottom: 20px;" th:if="${success}">
+        <p th:utext="${success}"></p> <!-- Используем th:utext для отображения HTML -->
+    </div>
+    <!-- Сообщение об ошибке -->
+    <div style="color: red; margin-bottom: 20px;" th:if="${error}">
+        <p th:text="${error}"></p>
+    </div>
+    <form method="post" action="/api/auth/register">
+        <div>
+            <label for="name">Имя:</label>
+            <input type="text" id="name" name="name" required>
+        </div>
+        <div>
+            <label for="surname">Фамилия:</label>
+            <input type="text" id="surname" name="surname" required>
+        </div>
+        <div>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+        </div>
+        <div>
+            <label for="password">Пароль:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit">Зарегистрироваться</button>
+    </form>
+</div>
+</body>
+</html>

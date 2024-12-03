@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Выбор аккаунта</title>
+</head>
+<body>
+<h1>Выберите аккаунт</h1>
+<ul>
+    <li th:each="account : ${accounts}">
+        <span th:text="${account.accountName}"></span>
+        <a th:href="@{'/goals/' + ${account.idAccount}}">Посмотреть цели</a>
+    </li>
+</ul>
+</body>
+</html>

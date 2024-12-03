@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Планы бюджета</title>
+</head>
+<body>
+<h1>Планы бюджета для цели</h1>
+
+<table border="1">
+    <thead>
+    <tr>
+        <th>Название</th>
+        <th>Сумма</th>
+        <th>Дата начала</th>
+        <th>Дата окончания</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="plan : ${budgetPlans}">
+        <td>
+            <form th:action="@{'/budget-plans/' + ${goalId} + '/update'}" method="post" style="display:inline;">
+                <input type="hidden" name="idBudget" th:value="${plan.idBudget}">
+                <input type="text" name="planName" th:value="${plan.planName}" required>
+        </td>
+        <td>
+            <input type="number" name="planAmount" th:value="${plan.planAmount}" required>
+        </td>
+        <td>
+            <input type="date" name="startDate" th:value="${plan.startDate}" required>
+        </td>
+        <td>
+            <input type="date" name="endDate" th:value="${plan.endDate}" required>
+        </td>
+        <td>
+            <button type="submit">Сохранить</button>
+            </form>
+            <form th:action="@{'/budget-plans/' + ${goalId} + '/delete'}" method="post" style="display:inline;">
+                <input type="hidden" name="idBudget" th:value="${plan.idBudget}">
+                <button type="submit">Удалить</button>
+            </form>
+            <a th:href="@{'/budget-plans/' + ${goalId} + '/' + ${plan.idBudget} + '/details'}">Подробнее</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<h2>Добавить новый план бюджета</h2>
+<form th:action="@{'/budget-plans/' + ${goalId} + '/add'}" method="post">
+    <label for="planName">Название:</label>
+    <input type="text" id="planName" name="planName" required><br>
+    <label for="planAmount">Сумма:</label>
+    <input type="number" id="planAmount" name="planAmount" required><br>
+    <label for="startDate">Дата начала:</label>
+    <input type="date" id="startDate" name="startDate" required><br>
+    <label for="endDate">Дата окончания:</label>
+    <input type="date" id="endDate" name="endDate" required><br>
+    <button type="submit">Добавить</button>
+</form>
+
+<a th:href="@{'/goals/' + ${accountId}}">Назад к целям</a>
+
+</body>
+</html>
