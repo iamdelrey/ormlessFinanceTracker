@@ -125,12 +125,14 @@ public class BudgetPlanController {
         budgetPlan.setIdGoal(goalId);
         budgetPlanService.addBudgetPlan(budgetPlan);
 
-        // Проверка на отрицательный баланс
+        // Генерация уведомления при отрицательном балансе
         if (budgetPlan.getPlanAmount().compareTo(BigDecimal.ZERO) < 0) {
-            notificationService.createNotification(
+            notificationDAO.save(new Notification(
                     "Баланс плана бюджета '" + budgetPlan.getPlanName() + "' отрицательный!",
+                    LocalDateTime.now(),
+                    "Непрочитано",
                     user.getId()
-            );
+            ));
         }
 
         return "redirect:/budget-plans/" + goalId;
@@ -142,16 +144,19 @@ public class BudgetPlanController {
         User user = userService.findByEmail(springUser.getUsername());
         budgetPlanService.updateBudgetPlan(budgetPlan);
 
-        // Проверка на отрицательный баланс
+        // Генерация уведомления при отрицательном балансе
         if (budgetPlan.getPlanAmount().compareTo(BigDecimal.ZERO) < 0) {
-            notificationService.createNotification(
+            notificationDAO.save(new Notification(
                     "Баланс плана бюджета '" + budgetPlan.getPlanName() + "' отрицательный!",
+                    LocalDateTime.now(),
+                    "Непрочитано",
                     user.getId()
-            );
+            ));
         }
 
         return "redirect:/budget-plans/" + goalId;
     }
+
 
 
     @PostMapping("/{goalId}/delete")

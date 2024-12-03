@@ -71,30 +71,17 @@ public class BudgetPlanService {
     }
 
     public void generateNotifications(int userId) {
-        // Сумма бюджета
-        BigDecimal totalBudgetPlans = budgetPlanDAO.findTotalPlanAmountByUserId(userId);
-
-        // Сумма транзакций
-        BigDecimal totalTransactions = transactionDAO.findTotalTransactionAmountByUserId(userId);
-
-        // Если общий бюджет отрицательный
-        if (totalBudgetPlans.compareTo(BigDecimal.ZERO) < 0) {
-            Notification notification = new Notification();
-            notification.setNotificationText("Внимание! Ваш общий бюджет отрицательный!");
-            notification.setNotificationDateTime(LocalDateTime.now());
-            notification.setStatus("Непрочитано");
-            notification.setIdUser(userId);
-            notificationDAO.save(notification);
-        }
-
-        // Если общий бюджет больше или равен транзакциям
-        if (totalTransactions.compareTo(totalBudgetPlans) >= 0) {
-            Notification notification = new Notification();
-            notification.setNotificationText("Поздравляем! Вы достигли цели бюджета.");
-            notification.setNotificationDateTime(LocalDateTime.now());
-            notification.setStatus("Непрочитано");
-            notification.setIdUser(userId);
-            notificationDAO.save(notification);
+        List<BudgetPlan> plans = budgetPlanDAO.findByUserId(userId);
+        for (BudgetPlan plan : plans) {
+            if (plan.getPlanAmount().compareTo(BigDecimal.ZERO) < 0) {
+                notificationDAO.save(new Notification(
+                        "Баланс плана бюджета '" + plan.getPlanName() + "' отрицательный!",
+                        LocalDateTime.now(),
+                        "Непрочитано",
+                        userId
+                ));
+            }
         }
     }
+
 }

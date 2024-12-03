@@ -21,19 +21,28 @@ public class NotificationDAO {
         return jdbcTemplate.query(sql, new Object[]{userId}, this::mapRowToNotification);
     }
 
-    public void save(Notification notification) {
-        String sql = "INSERT INTO \"Notification\" (notification_text, notification_date_time, status, id_user) " +
-                "VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(sql, notification.getNotificationText(), notification.getNotificationDateTime(),
-                notification.getStatus(), notification.getIdUser());
-    }
-
     public void delete(int notificationId) {
         String sql = "DELETE FROM \"Notification\" WHERE id_notification = ?";
         jdbcTemplate.update(sql, notificationId);
     }
 
     public void markAllAsReadForUser(int userId) {
+        String sql = "UPDATE \"Notification\" SET status = 'Прочитано' WHERE id_user = ? AND status = 'Непрочитано'";
+        jdbcTemplate.update(sql, userId);
+    }
+
+    public void save(Notification notification) {
+        String sql = "INSERT INTO \"Notification\" (notification_text, notification_date_time, status, id_user) " +
+                "VALUES (?, ?, ?, ?)";
+        jdbcTemplate.update(sql,
+                notification.getNotificationText(),
+                notification.getNotificationDateTime(),
+                notification.getStatus(),
+                notification.getIdUser()
+        );
+    }
+
+    public void markAllAsRead(int userId) {
         String sql = "UPDATE \"Notification\" SET status = 'Прочитано' WHERE id_user = ? AND status = 'Непрочитано'";
         jdbcTemplate.update(sql, userId);
     }

@@ -59,6 +59,11 @@ public class TransactionDAO {
         return jdbcTemplate.queryForObject(sql, new Object[]{userId}, BigDecimal.class);
     }
 
+    public void markAllAsReadForUser(int userId) {
+        String sql = "UPDATE \"Notification\" SET status = 'Прочитано' WHERE status = 'Непрочитано' AND id_user = ?";
+        jdbcTemplate.update(sql, userId);
+    }
+
     private Transaction mapRowToTransaction(ResultSet rs, int rowNum) throws SQLException {
         Transaction transaction = new Transaction();
         transaction.setIdTransaction(rs.getInt("id_transaction"));

@@ -1,7 +1,7 @@
 package rbd.ormless.financetracker.controller;
 
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.User;
+import rbd.ormless.financetracker.model.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import rbd.ormless.financetracker.service.NotificationService;
@@ -26,9 +26,9 @@ public class NotificationController {
     }
 
     @PostMapping("/mark-read")
-    public String markAllNotificationsAsRead(@AuthenticationPrincipal User springUser, @RequestParam int goalId) {
-        rbd.ormless.financetracker.model.User user = userService.findByEmail(springUser.getUsername());
+    public String markAllNotificationsAsRead(@AuthenticationPrincipal org.springframework.security.core.userdetails.User springUser) {
+        User user = userService.findByEmail(springUser.getUsername());
         notificationService.markAllAsReadForUser(user.getId());
-        return "redirect:/budget-plans/" + goalId;
+        return "redirect:/budget-plans";
     }
 }

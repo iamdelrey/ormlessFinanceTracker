@@ -60,6 +60,12 @@ public class BudgetPlanDAO {
         return jdbcTemplate.queryForObject(sql, new Object[]{userId}, BigDecimal.class);
     }
 
+    public List<BudgetPlan> findByUserId(int userId) {
+        String sql = "SELECT * FROM \"Budget_plan\" WHERE id_user = ?";
+        return jdbcTemplate.query(sql, new Object[]{userId}, this::mapRowToBudgetPlan);
+    }
+
+    // Маппинг строки из ResultSet в объект BudgetPlan
     private BudgetPlan mapRowToBudgetPlan(ResultSet rs, int rowNum) throws SQLException {
         BudgetPlan budgetPlan = new BudgetPlan();
         budgetPlan.setIdBudget(rs.getInt("id_budget"));
@@ -72,5 +78,4 @@ public class BudgetPlanDAO {
         budgetPlan.setPlanDetails(rs.getString("plan_details"));
         return budgetPlan;
     }
-
 }

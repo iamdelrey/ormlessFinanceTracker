@@ -17,18 +17,20 @@
             return true;
         }
     </script>
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            setTimeout(() => {
-                fetch('/notifications/mark-read', { method: 'POST' })
-                    .then(response => {
-                        if (response.ok) {
-                            location.reload();
-                        }
-                    });
-            }, 5000); // 5 секунд
-        });
-    </script>
+    <head>
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                setTimeout(() => {
+                    fetch('/notifications/mark-read', { method: 'POST' })
+                        .then(response => {
+                            if (response.ok) {
+                                location.reload(); // Перезагрузка страницы после обновления
+                            }
+                        });
+                }, 5000); // 5 секунд
+            });
+        </script>
+    </head>
 
 </head>
 <body>
