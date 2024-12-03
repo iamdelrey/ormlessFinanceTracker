@@ -21,7 +21,11 @@ public class NotificationController {
 
     @PostMapping("/delete")
     public String deleteNotification(@RequestParam int notificationId, @RequestParam int goalId) {
+        System.out.println("Удаляем уведомление с ID: " + notificationId);
         notificationService.deleteNotification(notificationId);
+
+        // Убедитесь, что здесь не запускаются лишние процессы
+        System.out.println("Уведомление удалено. Перенаправление к целям.");
         return "redirect:/budget-plans/" + goalId;
     }
 

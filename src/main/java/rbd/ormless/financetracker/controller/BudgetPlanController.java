@@ -125,38 +125,40 @@ public class BudgetPlanController {
         budgetPlan.setIdGoal(goalId);
         budgetPlanService.addBudgetPlan(budgetPlan);
 
-        // Генерация уведомления при отрицательном балансе
         if (budgetPlan.getPlanAmount().compareTo(BigDecimal.ZERO) < 0) {
-            notificationDAO.save(new Notification(
-                    "Баланс плана бюджета '" + budgetPlan.getPlanName() + "' отрицательный!",
-                    LocalDateTime.now(),
-                    "Непрочитано",
-                    user.getId()
-            ));
+            // Использование existsNotificationForPlan
+            if (!notificationDAO.existsNotificationForPlan(budgetPlan.getIdBudget(), user.getId())) {
+                notificationDAO.save(new Notification(
+                        "Баланс плана бюджета '" + budgetPlan.getPlanName() + "' отрицательный!",
+                        LocalDateTime.now(),
+                        "Непрочитано",
+                        user.getId()
+                ));
+            }
         }
 
         return "redirect:/budget-plans/" + goalId;
     }
-
     @PostMapping("/{goalId}/update")
     public String updateBudgetPlan(@PathVariable int goalId, @ModelAttribute BudgetPlan budgetPlan,
                                    @AuthenticationPrincipal org.springframework.security.core.userdetails.User springUser) {
         User user = userService.findByEmail(springUser.getUsername());
         budgetPlanService.updateBudgetPlan(budgetPlan);
 
-        // Генерация уведомления при отрицательном балансе
         if (budgetPlan.getPlanAmount().compareTo(BigDecimal.ZERO) < 0) {
-            notificationDAO.save(new Notification(
-                    "Баланс плана бюджета '" + budgetPlan.getPlanName() + "' отрицательный!",
-                    LocalDateTime.now(),
-                    "Непрочитано",
-                    user.getId()
-            ));
+            // Использование existsNotificationForPlan
+            if (!notificationDAO.existsNotificationForPlan(budgetPlan.getIdBudget(), user.getId())) {
+                notificationDAO.save(new Notification(
+                        "Баланс плана бюджета '" + budgetPlan.getPlanName() + "' отрицательный!",
+                        LocalDateTime.now(),
+                        "Непрочитано",
+                        user.getId()
+                ));
+            }
         }
 
         return "redirect:/budget-plans/" + goalId;
     }
-
 
 
     @PostMapping("/{goalId}/delete")
@@ -181,7 +183,7 @@ public class BudgetPlanController {
     public String listTransactions(@PathVariable int goalId, @PathVariable int idBudget,
                                    @PathVariable int idCategory, Model model) {
         String categoryName = categoryService.getCategoryNameById(idCategory);
-        List<Transaction> transactions = transactionService.getTransactionsByCategoryId(categoryName);
+        List<Transaction> transactions = transactionService.getTransactionsByBudgetId(idBudget);
 
         BigDecimal totalTransactions = transactions.stream()
                 .map(Transaction::getAmount)

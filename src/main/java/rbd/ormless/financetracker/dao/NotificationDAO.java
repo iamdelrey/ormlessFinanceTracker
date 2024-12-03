@@ -32,19 +32,28 @@ public class NotificationDAO {
     }
 
     public void save(Notification notification) {
+        // Удаляем старые уведомления для пользователя
+        String deleteOldNotificationsSql = "DELETE FROM \"Notification\" WHERE id_user = ? AND notification_date_time < NOW() - INTERVAL '1 minute'";
+        jdbcTemplate.update(deleteOldNotificationsSql, notification.getIdUser());
+
+        // Добавляем новое уведомление
         String sql = "INSERT INTO \"Notification\" (notification_text, notification_date_time, status, id_user) " +
                 "VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(sql,
-                notification.getNotificationText(),
-                notification.getNotificationDateTime(),
-                notification.getStatus(),
-                notification.getIdUser()
-        );
+        jdbcTemplate.update(sql, notification.getNotificationText(), notification.getNotificationDateTime(),
+                notification.getStatus(), notification.getIdUser());
     }
+
 
     public void markAllAsRead(int userId) {
         String sql = "UPDATE \"Notification\" SET status = 'Прочитано' WHERE id_user = ? AND status = 'Непрочитано'";
         jdbcTemplate.update(sql, userId);
+    }
+
+    public boolean existsNotificationForPlan(int planId, int userId) {
+        String sql = "SELECT COUNT(*) FROM \"Notification\" WHERE notification_text = ? AND id_user = ?";
+        String notificationText = "Баланс плана бюджета '" + planId + "' отрицательный!";
+        Integer count = jdbcTemplate.queryForObject(sql, new Object[]{notificationText, userId}, Integer.class);
+        return count != null && count > 0;
     }
 
     private Notification mapRowToNotification(ResultSet rs, int rowNum) throws SQLException {

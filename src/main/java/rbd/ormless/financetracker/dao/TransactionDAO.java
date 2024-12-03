@@ -20,8 +20,11 @@ public class TransactionDAO {
 
     public List<Transaction> findByCategoryId(String category) {
         String sql = "SELECT * FROM \"Transaction\" WHERE category = ?";
-        return jdbcTemplate.query(sql, new Object[]{category}, this::mapRowToTransaction);
+        List<Transaction> transactions = jdbcTemplate.query(sql, new Object[]{category}, this::mapRowToTransaction);
+        System.out.println("Транзакции для категории: " + category + ", результат: " + transactions);
+        return transactions;
     }
+
 
     public void addTransaction(Transaction transaction) {
         String sql = "INSERT INTO \"Transaction\" (id_account, id_user, amount, date_time, transaction_type, category, description, id_budget, id_goal) " +
