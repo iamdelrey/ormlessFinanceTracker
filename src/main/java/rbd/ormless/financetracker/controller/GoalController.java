@@ -7,9 +7,11 @@ import org.springframework.web.bind.annotation.*;
 import rbd.ormless.financetracker.model.Goal;
 import rbd.ormless.financetracker.model.User;
 import rbd.ormless.financetracker.service.AccountService;
+import rbd.ormless.financetracker.service.BudgetPlanService;
 import rbd.ormless.financetracker.service.GoalService;
 import rbd.ormless.financetracker.service.UserService;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +24,7 @@ public class GoalController {
     private final GoalService goalService;
     private final UserService userService;
     private final AccountService accountService;
+    private BudgetPlanService budgetPlanService;
 
     public GoalController(GoalService goalService, UserService userService, AccountService accountService) {
         this.goalService = goalService;
@@ -127,4 +130,12 @@ public class GoalController {
         goalService.deleteGoal(goalId, accountId);
         return "redirect:/goals/" + accountId;
     }
+
+    @GetMapping("/goals/{goalId}/total-budget")
+    public String getTotalBudgetForGoal(@PathVariable Long goalId, Model model) {
+        BigDecimal totalBudget = budgetPlanService.calculateTotalBudgetForGoal(goalId);
+        model.addAttribute("totalBudget", totalBudget);
+        return "goals";
+    }
+
 }

@@ -59,11 +59,12 @@ public class BudgetPlanDAO {
         budgetPlan.setIdBudget(rs.getInt("id_budget"));
         budgetPlan.setIdUser(rs.getInt("id_user"));
         budgetPlan.setPlanName(rs.getString("plan_name"));
-        budgetPlan.setPlanAmount(rs.getInt("plan_amount"));
+        budgetPlan.setPlanAmount(rs.getBigDecimal("plan_amount"));
         budgetPlan.setStartDate(rs.getDate("start_date").toLocalDate());
         budgetPlan.setEndDate(rs.getDate("end_date").toLocalDate());
         budgetPlan.setIdGoal(rs.getInt("id_goal"));
         budgetPlan.setPlanDetails(rs.getString("plan_details"));
         return budgetPlan;
     }
+
 }

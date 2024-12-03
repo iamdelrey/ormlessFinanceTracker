@@ -48,12 +48,17 @@ public class TransactionDAO {
         jdbcTemplate.update(sql, idTransaction, idUser);
     }
 
+    public List<Transaction> findByBudgetPlanId(Long budgetPlanId) {
+        String sql = "SELECT * FROM \"Transaction\" WHERE id_budget = ?";
+        return jdbcTemplate.query(sql, new Object[]{budgetPlanId}, this::mapRowToTransaction);
+    }
+
     private Transaction mapRowToTransaction(ResultSet rs, int rowNum) throws SQLException {
         Transaction transaction = new Transaction();
         transaction.setIdTransaction(rs.getInt("id_transaction"));
         transaction.setIdAccount(rs.getInt("id_account"));
         transaction.setIdUser(rs.getInt("id_user"));
-        transaction.setAmount(rs.getInt("amount"));
+        transaction.setAmount(rs.getBigDecimal("amount"));
         transaction.setDateTime(rs.getTimestamp("date_time").toLocalDateTime());
         transaction.setTransactionType(rs.getString("transaction_type"));
         transaction.setCategory(rs.getString("category"));

@@ -1,12 +1,13 @@
 package rbd.ormless.financetracker.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 public class Transaction {
     private int idTransaction;
     private int idAccount;
     private int idUser;
-    private int amount;
+    private BigDecimal amount;
     private LocalDateTime dateTime;
     private String transactionType;
     private String category;
@@ -14,8 +15,6 @@ public class Transaction {
     private int idBudget;
     private int idGoal;
     private String formattedDateTime;
-
-    // Геттеры и сеттеры
     public Integer getIdTransaction() {
         return idTransaction;
     }
@@ -40,11 +39,11 @@ public class Transaction {
         this.idUser = idUser;
     }
 
-    public Integer getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Integer amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 

@@ -1,12 +1,13 @@
 package rbd.ormless.financetracker.model;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public class BudgetPlan {
     private Integer idBudget;
     private Integer idUser;
     private String planName;
-    private Integer planAmount;
+    private BigDecimal planAmount;
     private LocalDate startDate;
     private LocalDate endDate;
     private Integer idGoal;
@@ -37,11 +38,12 @@ public class BudgetPlan {
         this.planName = planName;
     }
 
-    public Integer getPlanAmount() {
+
+    public BigDecimal getPlanAmount() {
         return planAmount;
     }
 
-    public void setPlanAmount(Integer planAmount) {
+    public void setPlanAmount(BigDecimal planAmount) {
         this.planAmount = planAmount;
     }
 

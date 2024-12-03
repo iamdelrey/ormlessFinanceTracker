@@ -4,6 +4,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Планы бюджета</title>
+    <script>
+        function validateDates(formId) {
+            const form = document.getElementById(formId);
+            const startDate = form.querySelector("input[name='startDate']").value;
+            const endDate = form.querySelector("input[name='endDate']").value;
+
+            if (startDate && endDate && new Date(endDate) < new Date(startDate)) {
+                alert("Дата окончания не может быть раньше даты начала.");
+                return false;
+            }
+            return true;
+        }
+    </script>
 </head>
 <body>
 <h1>Планы бюджета для цели</h1>
@@ -16,6 +29,7 @@
         <th>Дата начала</th>
         <th>Дата окончания</th>
         <th>Действия</th>
+        <th>Сумма транзакций</th>
     </tr>
     </thead>
     <tbody>
@@ -43,12 +57,20 @@
             </form>
             <a th:href="@{'/budget-plans/' + ${goalId} + '/' + ${plan.idBudget} + '/details'}">Подробнее</a>
         </td>
+        <td>
+            <p>Сумма транзакций: <span th:text="${transactionsTotals[plan.idBudget]}">0</span></p>
+        </td>
     </tr>
+
     </tbody>
+
 </table>
+<h2>Общая сумма всех планов бюджета:</h2>
+<p th:text="${totalBudget}">0</p>
+
 
 <h2>Добавить новый план бюджета</h2>
-<form th:action="@{'/budget-plans/' + ${goalId} + '/add'}" method="post">
+<form th:action="@{'/budget-plans/' + ${goalId} + '/add'}" method="post" id="addForm" onsubmit="return validateDates('addForm')">
     <label for="planName">Название:</label>
     <input type="text" id="planName" name="planName" required><br>
     <label for="planAmount">Сумма:</label>

@@ -55,7 +55,7 @@
 
     <button type="submit">Сохранить изменения</button>
 </form>
-
+<h2>Общая сумма бюджетных планов для цели: <span th:text="${totalBudget}"></span></h2>
 <h2>Добавить новую цель</h2>
 <form th:action="@{'/goals/' + ${accountId} + '/add'}" method="post">
     <label for="goalName">Название:</label>

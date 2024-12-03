@@ -13,9 +13,12 @@ import rbd.ormless.financetracker.service.CategoryService;
 import rbd.ormless.financetracker.service.TransactionService;
 import rbd.ormless.financetracker.service.UserService;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/budget-plans")
@@ -39,11 +42,26 @@ public class BudgetPlanController {
         List<BudgetPlan> budgetPlans = budgetPlanService.getBudgetPlansByGoalId(goalId);
         int accountId = budgetPlanService.getAccountIdByGoalId(goalId);
 
+        // Считаем общую сумму планов бюджета
+        BigDecimal totalBudget = budgetPlans.stream()
+                .map(BudgetPlan::getPlanAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // Считаем сумму транзакций для каждого плана бюджета
+        Map<Integer, BigDecimal> transactionsTotals = new HashMap<>();
+        for (BudgetPlan plan : budgetPlans) {
+            BigDecimal totalTransactions = budgetPlanService.calculateTotalTransactionsForBudgetPlan(plan.getIdBudget().longValue());
+            transactionsTotals.put(plan.getIdBudget(), totalTransactions);
+        }
+
         model.addAttribute("budgetPlans", budgetPlans);
+        model.addAttribute("totalBudget", totalBudget);
+        model.addAttribute("transactionsTotals", transactionsTotals); // Передаем суммы транзакций в модель
         model.addAttribute("goalId", goalId);
         model.addAttribute("accountId", accountId);
         return "budget-plans";
     }
+
 
     @GetMapping("/{goalId}/{idBudget}/details")
     public String budgetPlanDetails(@PathVariable int goalId, @PathVariable int idBudget, Model model) {
@@ -115,18 +133,24 @@ public class BudgetPlanController {
         String categoryName = categoryService.getCategoryNameById(idCategory);
         List<Transaction> transactions = transactionService.getTransactionsByCategoryId(categoryName);
 
-        // Преобразование LocalDateTime в строку
+        // Вычисляем общую сумму транзакций
+        BigDecimal totalTransactions = transactions.stream()
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
         transactions.forEach(transaction -> {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
             transaction.setFormattedDateTime(transaction.getDateTime().format(formatter));
         });
 
         model.addAttribute("transactions", transactions);
+        model.addAttribute("totalTransactions", totalTransactions); // Передаем сумму в модель
         model.addAttribute("goalId", goalId);
         model.addAttribute("idBudget", idBudget);
         model.addAttribute("idCategory", idCategory);
         return "transactions";
     }
+
 
 
     @PostMapping("/{goalId}/{idBudget}/{idCategory}/add-transaction")
@@ -154,11 +178,10 @@ public class BudgetPlanController {
         User user = userService.findByEmail(springUser.getUsername());
         transaction.setIdUser(user.getId());
         transaction.setCategory(categoryService.getCategoryNameById(idCategory));
-        transaction.setDateTime(LocalDateTime.parse(dateTime)); // Парсинг даты
+        transaction.setDateTime(LocalDateTime.parse(dateTime));
         transactionService.updateTransaction(transaction);
         return "redirect:/budget-plans/" + goalId + "/" + idBudget + "/" + idCategory + "/transactions";
     }
-
 
 
     @PostMapping("/{goalId}/{idBudget}/{idCategory}/delete-transaction")
@@ -171,5 +194,10 @@ public class BudgetPlanController {
         return "redirect:/budget-plans/" + goalId + "/" + idBudget + "/" + idCategory + "/transactions";
     }
 
-
+    @GetMapping("/budget-plans/{budgetPlanId}/total-transactions")
+    public String getTotalTransactionsForBudgetPlan(@PathVariable Long budgetPlanId, Model model) {
+        BigDecimal totalTransactions = budgetPlanService.calculateTotalTransactionsForBudgetPlan(budgetPlanId);
+        model.addAttribute("totalTransactions", totalTransactions);
+        return "budget-plans";
+    }
 }
