@@ -8,21 +8,30 @@ import java.util.List;
 
 @Service
 public class CategoryService {
+
     private final CategoryDAO categoryDAO;
 
     public CategoryService(CategoryDAO categoryDAO) {
         this.categoryDAO = categoryDAO;
     }
 
-    public List<Category> getCategoriesByBudgetId(int idBudget) {
-        return categoryDAO.findAllByBudgetId(idBudget);
+    public List<Category> getCategoriesByBudgetId(int budgetId) {
+        return categoryDAO.findByBudgetId(budgetId);
     }
 
     public void addCategory(Category category) {
-        categoryDAO.save(category);
+        categoryDAO.addCategory(category);
+    }
+
+    public void updateCategory(Category category) {
+        categoryDAO.updateCategory(category);
+    }
+
+    public String getCategoryNameById(int idCategory) {
+        return categoryDAO.findCategoryNameById(idCategory);
     }
 
     public void deleteCategory(int idCategory, int idUser) {
-        categoryDAO.delete(idCategory, idUser);
+        categoryDAO.deleteCategory(idCategory, idUser);
     }
 }

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Транзакции</title>
+</head>
+<body>
+<h1>Транзакции</h1>
+
+<!-- Таблица для отображения транзакций -->
+<table border="1">
+    <thead>
+    <tr>
+        <th>Описание</th>
+        <th>Сумма</th>
+        <th>Дата</th>
+        <th>Тип</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="transaction : ${transactions}">
+        <td th:text="${transaction.description}"></td>
+        <td th:text="${transaction.amount}"></td>
+        <td th:text="${transaction.dateTime}"></td>
+        <td th:text="${transaction.transactionType}"></td>
+        <td>
+            <!-- Форма для обновления транзакции -->
+            <form th:action="@{'/budget-plans/' + ${goalId} + '/' + ${idBudget} + '/' + ${idCategory} + '/update-transaction'}" method="post" style="display:inline;">
+                <input type="hidden" name="idTransaction" th:value="${transaction.idTransaction}">
+                <input type="text" name="description" th:value="${transaction.description}" required>
+                <input type="number" name="amount" th:value="${transaction.amount}" required>
+                <select name="transactionType" required>
+                    <option th:selected="${transaction.transactionType == 'Доход'}" value="Доход">Доход</option>
+                    <option th:selected="${transaction.transactionType == 'Расход'}" value="Расход">Расход</option>
+                </select>
+                <input type="datetime-local" name="dateTime" th:value="${transaction.formattedDateTime}" required>
+                <button type="submit">Обновить</button>
+            </form>
+
+
+            <!-- Форма для удаления транзакции -->
+            <form th:action="@{'/budget-plans/' + ${goalId} + '/' + ${idBudget} + '/' + ${idCategory} + '/delete-transaction'}" method="post" style="display:inline;">
+                <input type="hidden" name="idTransaction" th:value="${transaction.idTransaction}">
+                <button type="submit">Удалить</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Форма для добавления новой транзакции -->
+<h3>Добавить новую транзакцию</h3>
+<form th:action="@{'/budget-plans/' + ${goalId} + '/' + ${idBudget} + '/' + ${idCategory} + '/add-transaction'}" method="post">
+    <label for="description">Описание:</label>
+    <input type="text" id="description" name="description" placeholder="Описание" required>
+    <label for="amount">Сумма:</label>
+    <input type="number" id="amount" name="amount" placeholder="Сумма" required>
+    <label for="transactionType">Тип транзакции:</label>
+    <select id="transactionType" name="transactionType" required>
+        <option value="Доход">Доход</option>
+        <option value="Расход">Расход</option>
+    </select>
+    <label for="dateTime">Дата:</label>
+    <input type="datetime-local" id="dateTime" name="dateTime" required>
+    <button type="submit">Добавить</button>
+</form>
+
+<!-- Ссылка для возврата к категориям -->
+<a th:href="@{'/budget-plans/' + ${goalId} + '/' + ${idBudget} + '/details'}">Назад к категориям</a>
+
+</body>
+</html>

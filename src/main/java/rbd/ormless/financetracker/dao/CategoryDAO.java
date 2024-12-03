@@ -16,19 +16,29 @@ public class CategoryDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public List<Category> findAllByBudgetId(int idBudget) {
+    public List<Category> findByBudgetId(int budgetId) {
         String sql = "SELECT * FROM \"Category\" WHERE id_budget = ?";
-        return jdbcTemplate.query(sql, new Object[]{idBudget}, this::mapRowToCategory);
+        return jdbcTemplate.query(sql, new Object[]{budgetId}, this::mapRowToCategory);
     }
 
-    public void save(Category category) {
+    public void addCategory(Category category) {
         String sql = "INSERT INTO \"Category\" (id_user, id_budget, id_goal, category_name) VALUES (?, ?, ?, ?)";
         jdbcTemplate.update(sql, category.getIdUser(), category.getIdBudget(), category.getIdGoal(), category.getCategoryName());
     }
 
-    public void delete(int idCategory, int idUser) {
+    public String findCategoryNameById(int idCategory) {
+        String sql = "SELECT category_name FROM \"Category\" WHERE id_category = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{idCategory}, String.class);
+    }
+
+    public void updateCategory(Category category) {
+        String sql = "UPDATE \"Category\" SET category_name = ? WHERE id_category = ?";
+        jdbcTemplate.update(sql, category.getCategoryName(), category.getIdCategory());
+    }
+
+    public void deleteCategory(int categoryId, int userId) {
         String sql = "DELETE FROM \"Category\" WHERE id_category = ? AND id_user = ?";
-        jdbcTemplate.update(sql, idCategory, idUser);
+        jdbcTemplate.update(sql, categoryId, userId);
     }
 
     private Category mapRowToCategory(ResultSet rs, int rowNum) throws SQLException {

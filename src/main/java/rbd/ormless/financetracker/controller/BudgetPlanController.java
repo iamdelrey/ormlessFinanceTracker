@@ -6,11 +6,15 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import rbd.ormless.financetracker.model.BudgetPlan;
 import rbd.ormless.financetracker.model.Category;
+import rbd.ormless.financetracker.model.Transaction;
 import rbd.ormless.financetracker.model.User;
 import rbd.ormless.financetracker.service.BudgetPlanService;
 import rbd.ormless.financetracker.service.CategoryService;
+import rbd.ormless.financetracker.service.TransactionService;
 import rbd.ormless.financetracker.service.UserService;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
@@ -20,11 +24,14 @@ public class BudgetPlanController {
     private final BudgetPlanService budgetPlanService;
     private final UserService userService;
     private final CategoryService categoryService;
+    private final TransactionService transactionService;
 
-    public BudgetPlanController(BudgetPlanService budgetPlanService, UserService userService, CategoryService categoryService) {
+
+    public BudgetPlanController(BudgetPlanService budgetPlanService, UserService userService, CategoryService categoryService, TransactionService transactionService) {
         this.budgetPlanService = budgetPlanService;
         this.userService = userService;
         this.categoryService = categoryService;
+        this.transactionService = transactionService;
     }
 
     @GetMapping("/{goalId}")
@@ -102,12 +109,67 @@ public class BudgetPlanController {
         return "redirect:/budget-plans/" + goalId + "/" + idBudget + "/details";
     }
 
-    @PostMapping("/{goalId}/{idBudget}/delete-category")
-    public String deleteCategory(@PathVariable int goalId, @PathVariable int idBudget,
-                                 @RequestParam int idCategory,
+    @GetMapping("/{goalId}/{idBudget}/{idCategory}/transactions")
+    public String listTransactions(@PathVariable int goalId, @PathVariable int idBudget,
+                                   @PathVariable int idCategory, Model model) {
+        String categoryName = categoryService.getCategoryNameById(idCategory);
+        List<Transaction> transactions = transactionService.getTransactionsByCategoryId(categoryName);
+
+        // Преобразование LocalDateTime в строку
+        transactions.forEach(transaction -> {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm");
+            transaction.setFormattedDateTime(transaction.getDateTime().format(formatter));
+        });
+
+        model.addAttribute("transactions", transactions);
+        model.addAttribute("goalId", goalId);
+        model.addAttribute("idBudget", idBudget);
+        model.addAttribute("idCategory", idCategory);
+        return "transactions";
+    }
+
+
+    @PostMapping("/{goalId}/{idBudget}/{idCategory}/add-transaction")
+    public String addTransaction(@PathVariable int goalId, @PathVariable int idBudget,
+                                 @PathVariable int idCategory,
+                                 @ModelAttribute Transaction transaction,
+                                 @RequestParam String dateTime,
                                  @AuthenticationPrincipal org.springframework.security.core.userdetails.User springUser) {
         User user = userService.findByEmail(springUser.getUsername());
-        categoryService.deleteCategory(idCategory, user.getId());
-        return "redirect:/budget-plans/" + goalId + "/" + idBudget + "/details";
+        transaction.setIdUser(user.getId());
+        transaction.setIdBudget(idBudget);
+        transaction.setIdGoal(goalId);
+        transaction.setCategory(categoryService.getCategoryNameById(idCategory));
+        transaction.setDateTime(LocalDateTime.parse(dateTime));
+        transactionService.addTransaction(transaction);
+        return "redirect:/budget-plans/" + goalId + "/" + idBudget + "/" + idCategory + "/transactions";
     }
+
+    @PostMapping("/{goalId}/{idBudget}/{idCategory}/update-transaction")
+    public String updateTransaction(@PathVariable int goalId, @PathVariable int idBudget,
+                                    @PathVariable int idCategory,
+                                    @ModelAttribute Transaction transaction,
+                                    @RequestParam String dateTime,
+                                    @AuthenticationPrincipal org.springframework.security.core.userdetails.User springUser) {
+        User user = userService.findByEmail(springUser.getUsername());
+        transaction.setIdUser(user.getId());
+        transaction.setCategory(categoryService.getCategoryNameById(idCategory));
+        transaction.setDateTime(LocalDateTime.parse(dateTime)); // Парсинг даты
+        transactionService.updateTransaction(transaction);
+        return "redirect:/budget-plans/" + goalId + "/" + idBudget + "/" + idCategory + "/transactions";
+    }
+
+
+
+    @PostMapping("/{goalId}/{idBudget}/{idCategory}/delete-transaction")
+    public String deleteTransaction(@PathVariable int goalId, @PathVariable int idBudget,
+                                    @PathVariable int idCategory,
+                                    @RequestParam int idTransaction,
+                                    @AuthenticationPrincipal org.springframework.security.core.userdetails.User springUser) {
+        User user = userService.findByEmail(springUser.getUsername());
+        transactionService.deleteTransaction(idTransaction, user.getId());
+        return "redirect:/budget-plans/" + goalId + "/" + idBudget + "/" + idCategory + "/transactions";
+    }
+
+
 }

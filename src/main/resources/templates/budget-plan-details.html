@@ -26,7 +26,6 @@
 </form>
 
 <h2>Категории</h2>
-<!-- Таблица для отображения категорий -->
 <table border="1">
     <thead>
     <tr>
@@ -36,18 +35,25 @@
     </thead>
     <tbody>
     <tr th:each="category : ${categories}">
-        <td th:text="${category.categoryName}"></td>
+        <td>
+            <form th:action="@{'/budget-plans/' + ${goalId} + '/' + ${budgetPlan.idBudget} + '/update-category'}" method="post" style="display:inline;">
+                <input type="hidden" name="idCategory" th:value="${category.idCategory}">
+                <input type="text" name="categoryName" th:value="${category.categoryName}" required>
+                <button type="submit">Изменить</button>
+            </form>
+        </td>
         <td>
             <form th:action="@{'/budget-plans/' + ${goalId} + '/' + ${budgetPlan.idBudget} + '/delete-category'}" method="post" style="display:inline;">
                 <input type="hidden" name="idCategory" th:value="${category.idCategory}">
                 <button type="submit">Удалить</button>
             </form>
+            <a th:href="@{'/budget-plans/' + ${goalId} + '/' + ${budgetPlan.idBudget} + '/' + ${category.idCategory} + '/transactions'}">Транзакции</a>
+
         </td>
     </tr>
     </tbody>
 </table>
 
-<!-- Форма для добавления новой категории -->
 <h3>Добавить новую категорию</h3>
 <form th:action="@{'/budget-plans/' + ${goalId} + '/' + ${budgetPlan.idBudget} + '/add-category'}" method="post">
     <label for="categoryName">Название категории:</label>
