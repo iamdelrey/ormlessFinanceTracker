@@ -1,13 +1,12 @@
 package rbd.ormless.financetracker.controller;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import rbd.ormless.financetracker.model.BudgetPlan;
-import rbd.ormless.financetracker.model.Category;
-import rbd.ormless.financetracker.model.Transaction;
-import rbd.ormless.financetracker.model.User;
+import rbd.ormless.financetracker.dao.NotificationDAO;
+import rbd.ormless.financetracker.model.*;
 import rbd.ormless.financetracker.service.BudgetPlanService;
 import rbd.ormless.financetracker.service.CategoryService;
 import rbd.ormless.financetracker.service.TransactionService;
@@ -28,26 +27,44 @@ public class BudgetPlanController {
     private final UserService userService;
     private final CategoryService categoryService;
     private final TransactionService transactionService;
+    private NotificationDAO notificationDAO;
 
 
-    public BudgetPlanController(BudgetPlanService budgetPlanService, UserService userService, CategoryService categoryService, TransactionService transactionService) {
+    public BudgetPlanController(BudgetPlanService budgetPlanService, UserService userService,
+                                CategoryService categoryService, TransactionService transactionService,
+                                NotificationDAO notificationDAO) {
         this.budgetPlanService = budgetPlanService;
         this.userService = userService;
         this.categoryService = categoryService;
         this.transactionService = transactionService;
+        this.notificationDAO = notificationDAO;
     }
 
     @GetMapping("/{goalId}")
-    public String listBudgetPlans(@PathVariable int goalId, Model model) {
+    public String listBudgetPlans(@PathVariable int goalId, Model model,
+                                  @AuthenticationPrincipal org.springframework.security.core.userdetails.User springUser) {
+        User user = userService.findByEmail(springUser.getUsername());
         List<BudgetPlan> budgetPlans = budgetPlanService.getBudgetPlansByGoalId(goalId);
-        int accountId = budgetPlanService.getAccountIdByGoalId(goalId);
 
-        // Считаем общую сумму планов бюджета
+        // Генерация уведомлений
+        budgetPlanService.generateNotifications(user.getId());
+
+        // Получение уведомлений для отображения
+        List<Notification> notifications = notificationDAO.findByUserId(user.getId());
+
+        // Форматирование даты
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+        notifications.forEach(notification -> {
+            notification.setNotificationDateTimeFormatted(
+                    notification.getNotificationDateTime().format(formatter)
+            );
+        });
+
+        // Остальная логика
         BigDecimal totalBudget = budgetPlans.stream()
                 .map(BudgetPlan::getPlanAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        // Считаем сумму транзакций для каждого плана бюджета
         Map<Integer, BigDecimal> transactionsTotals = new HashMap<>();
         for (BudgetPlan plan : budgetPlans) {
             BigDecimal totalTransactions = budgetPlanService.calculateTotalTransactionsForBudgetPlan(plan.getIdBudget().longValue());
@@ -56,10 +73,17 @@ public class BudgetPlanController {
 
         model.addAttribute("budgetPlans", budgetPlans);
         model.addAttribute("totalBudget", totalBudget);
-        model.addAttribute("transactionsTotals", transactionsTotals); // Передаем суммы транзакций в модель
+        model.addAttribute("transactionsTotals", transactionsTotals);
+        model.addAttribute("notifications", notifications); // Передаем уведомления в модель
         model.addAttribute("goalId", goalId);
-        model.addAttribute("accountId", accountId);
         return "budget-plans";
+    }
+
+    @PostMapping("/{goalId}/generate-notifications")
+    public String generateNotifications(@PathVariable int goalId, @AuthenticationPrincipal org.springframework.security.core.userdetails.User springUser) {
+        User user = userService.findByEmail(springUser.getUsername());
+        budgetPlanService.generateNotifications(user.getId());  // Генерируем уведомления
+        return "redirect:/budget-plans/" + goalId;
     }
 
 
@@ -100,14 +124,35 @@ public class BudgetPlanController {
         budgetPlan.setIdUser(user.getId());
         budgetPlan.setIdGoal(goalId);
         budgetPlanService.addBudgetPlan(budgetPlan);
+
+        // Проверка на отрицательный баланс
+        if (budgetPlan.getPlanAmount().compareTo(BigDecimal.ZERO) < 0) {
+            notificationService.createNotification(
+                    "Баланс плана бюджета '" + budgetPlan.getPlanName() + "' отрицательный!",
+                    user.getId()
+            );
+        }
+
         return "redirect:/budget-plans/" + goalId;
     }
 
     @PostMapping("/{goalId}/update")
-    public String updateBudgetPlan(@PathVariable int goalId, @ModelAttribute BudgetPlan budgetPlan) {
+    public String updateBudgetPlan(@PathVariable int goalId, @ModelAttribute BudgetPlan budgetPlan,
+                                   @AuthenticationPrincipal org.springframework.security.core.userdetails.User springUser) {
+        User user = userService.findByEmail(springUser.getUsername());
         budgetPlanService.updateBudgetPlan(budgetPlan);
+
+        // Проверка на отрицательный баланс
+        if (budgetPlan.getPlanAmount().compareTo(BigDecimal.ZERO) < 0) {
+            notificationService.createNotification(
+                    "Баланс плана бюджета '" + budgetPlan.getPlanName() + "' отрицательный!",
+                    user.getId()
+            );
+        }
+
         return "redirect:/budget-plans/" + goalId;
     }
+
 
     @PostMapping("/{goalId}/delete")
     public String deleteBudgetPlan(@PathVariable int goalId, @RequestParam int idBudget) {
@@ -133,7 +178,6 @@ public class BudgetPlanController {
         String categoryName = categoryService.getCategoryNameById(idCategory);
         List<Transaction> transactions = transactionService.getTransactionsByCategoryId(categoryName);
 
-        // Вычисляем общую сумму транзакций
         BigDecimal totalTransactions = transactions.stream()
                 .map(Transaction::getAmount)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
@@ -144,13 +188,12 @@ public class BudgetPlanController {
         });
 
         model.addAttribute("transactions", transactions);
-        model.addAttribute("totalTransactions", totalTransactions); // Передаем сумму в модель
+        model.addAttribute("totalTransactions", totalTransactions);
         model.addAttribute("goalId", goalId);
         model.addAttribute("idBudget", idBudget);
         model.addAttribute("idCategory", idCategory);
         return "transactions";
     }
-
 
 
     @PostMapping("/{goalId}/{idBudget}/{idCategory}/add-transaction")
@@ -200,4 +243,16 @@ public class BudgetPlanController {
         model.addAttribute("totalTransactions", totalTransactions);
         return "budget-plans";
     }
+    @GetMapping
+    public String getDefaultBudgetPlansPage() {
+        return "redirect:/goals"; // Или другое действие
+    }
+    @PostMapping("/notifications/mark-read")
+    @ResponseBody
+    public ResponseEntity<?> markNotificationsAsRead(@AuthenticationPrincipal org.springframework.security.core.userdetails.User springUser) {
+        User user = userService.findByEmail(springUser.getUsername());
+        notificationDAO.markAllAsReadForUser(user.getId());
+        return ResponseEntity.ok().build();
+    }
+
 }

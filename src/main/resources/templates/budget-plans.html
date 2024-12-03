@@ -17,6 +17,19 @@
             return true;
         }
     </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            setTimeout(() => {
+                fetch('/notifications/mark-read', { method: 'POST' })
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload();
+                        }
+                    });
+            }, 5000); // 5 секунд
+        });
+    </script>
+
 </head>
 <body>
 <h1>Планы бюджета для цели</h1>
@@ -81,6 +94,33 @@
     <input type="date" id="endDate" name="endDate" required><br>
     <button type="submit">Добавить</button>
 </form>
+
+<h2>Уведомления</h2>
+<table>
+    <thead>
+    <tr>
+        <th>Сообщение</th>
+        <th>Дата и время</th>
+        <th>Статус</th>
+        <th>Действия</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="notification : ${notifications}">
+        <td th:text="${notification.notificationText}"></td>
+        <td th:text="${#temporals.format(notification.notificationDateTime, 'dd.MM.yyyy HH:mm')}"></td>
+        <td th:text="${notification.status}"></td>
+        <td>
+            <form th:action="@{/notifications/delete}" method="post">
+                <input type="hidden" th:value="${notification.idNotification}" name="notificationId" />
+                <input type="hidden" th:value="${goalId}" name="goalId" />
+                <button type="submit">Удалить</button>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
 
 <a th:href="@{'/goals/' + ${accountId}}">Назад к целям</a>
 

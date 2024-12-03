@@ -7,6 +7,7 @@ import rbd.ormless.financetracker.model.Account;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.math.BigDecimal;
 
 @Repository
 public class AccountDAO {
@@ -35,6 +36,11 @@ public class AccountDAO {
     public void delete(int accountId, int userId) {
         String sql = "DELETE FROM \"Account\" WHERE id_account = ? AND id_user = ?";
         jdbcTemplate.update(sql, accountId, userId);
+    }
+
+    public BigDecimal getBalance(int userId) {
+        String sql = "SELECT COALESCE(SUM(balance), 0) FROM \"Account\" WHERE id_user = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{userId}, BigDecimal.class);
     }
 
     private Account mapRowToAccount(ResultSet rs, int rowNum) throws SQLException {

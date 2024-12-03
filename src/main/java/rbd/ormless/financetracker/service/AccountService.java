@@ -5,6 +5,7 @@ import rbd.ormless.financetracker.dao.AccountDAO;
 import rbd.ormless.financetracker.dao.UserDAO;
 import rbd.ormless.financetracker.model.Account;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -36,5 +37,9 @@ public class AccountService {
 
     public rbd.ormless.financetracker.model.User getUserByEmail(String email) {
         return userDAO.findByEmail(email).orElse(null);
+    }
+
+    public BigDecimal getAccountBalance(int userId) {
+        return accountDAO.getBalance(userId);
     }
 }

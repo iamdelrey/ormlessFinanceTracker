@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 import rbd.ormless.financetracker.model.Transaction;
 
+import java.math.BigDecimal;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -51,6 +52,11 @@ public class TransactionDAO {
     public List<Transaction> findByBudgetPlanId(Long budgetPlanId) {
         String sql = "SELECT * FROM \"Transaction\" WHERE id_budget = ?";
         return jdbcTemplate.query(sql, new Object[]{budgetPlanId}, this::mapRowToTransaction);
+    }
+
+    public BigDecimal findTotalTransactionAmountByUserId(int userId) {
+        String sql = "SELECT COALESCE(SUM(amount), 0) FROM \"Transaction\" WHERE id_user = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{userId}, BigDecimal.class);
     }
 
     private Transaction mapRowToTransaction(ResultSet rs, int rowNum) throws SQLException {

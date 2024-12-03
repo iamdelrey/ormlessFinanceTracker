@@ -7,6 +7,7 @@ import rbd.ormless.financetracker.model.BudgetPlan;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+import java.math.BigDecimal;
 
 @Repository
 public class BudgetPlanDAO {
@@ -52,6 +53,11 @@ public class BudgetPlanDAO {
     public BudgetPlan findById(int idBudget) {
         String sql = "SELECT * FROM \"Budget_plan\" WHERE id_budget = ?";
         return jdbcTemplate.queryForObject(sql, new Object[]{idBudget}, this::mapRowToBudgetPlan);
+    }
+
+    public BigDecimal findTotalPlanAmountByUserId(int userId) {
+        String sql = "SELECT COALESCE(SUM(plan_amount), 0) FROM \"Budget_plan\" WHERE id_user = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{userId}, BigDecimal.class);
     }
 
     private BudgetPlan mapRowToBudgetPlan(ResultSet rs, int rowNum) throws SQLException {

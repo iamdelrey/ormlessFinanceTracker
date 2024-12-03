@@ -1,24 +1,37 @@
 package rbd.ormless.financetracker.service;
 
 import org.springframework.stereotype.Service;
+import rbd.ormless.financetracker.dao.NotificationDAO;
+import rbd.ormless.financetracker.model.Notification;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 public class NotificationService {
 
-    private final List<String> notifications = new ArrayList<>();
+    private final NotificationDAO notificationDAO;
 
-    public void addNotification(String message) {
-        notifications.add(message);
+    public NotificationService(NotificationDAO notificationDAO) {
+        this.notificationDAO = notificationDAO;
     }
 
-    public List<String> getNotifications() {
-        return new ArrayList<>(notifications);
+    // Убедитесь, что это работает корректно в NotificationService
+    public void createNotification(String text, int userId) {
+        Notification notification = new Notification();
+        notification.setNotificationText(text);
+        notification.setNotificationDateTime(LocalDateTime.now());
+        notification.setStatus("Непрочитано");
+        notification.setIdUser(userId);
+
+        notificationDAO.save(notification);
     }
 
-    public void clearNotifications() {
-        notifications.clear();
+    public void deleteNotification(int notificationId) {
+        notificationDAO.delete(notificationId);
+    }
+
+    public void markAllAsRead(int userId) {
+        notificationDAO.markAllAsRead(userId);
     }
 }
+
