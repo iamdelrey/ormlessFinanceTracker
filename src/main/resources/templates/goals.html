@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Цели</title>
+    <title>Ваши цели</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         function fakeUpdate(event) {
             event.preventDefault();
@@ -20,49 +21,62 @@
         }
     </script>
 </head>
-<body>
-<h1>Ваши цели для аккаунта</h1>
-<form onsubmit="fakeUpdate(event)">
-    <table border="1">
-        <thead>
-        <tr>
-            <th>Название</th>
-            <th>Сумма</th>
-            <th>Действия</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="goal : ${goals}">
-            <td>
-                <input type="hidden" name="goals[${goal.idGoal}].idGoal" th:value="${goal.idGoal}">
-                <input type="text" name="goals[${goal.idGoal}].goalName" th:value="${goal.goalName}" required>
-            </td>
-            <td>
-                <input type="number" name="goals[${goal.idGoal}].goalAmount" th:value="${goal.goalAmount}" required>
-            </td>
-            <td>
-                <!-- Кнопка для удаления -->
-                <form th:action="@{'/goals/' + ${accountId} + '/delete'}" method="post" style="display:inline;">
-                    <input type="hidden" name="goalId" th:value="${goal.idGoal}">
-                    <button type="submit">Удалить</button>
-                </form>
-                <!-- Ссылка на планы бюджета -->
-                <a th:href="@{'/budget-plans/' + ${goal.idGoal}}">Перейти к планам бюджета</a>
-            </td>
-        </tr>
-        </tbody>
-    </table>
+<body class="bg-gray-100 text-gray-800">
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6 text-green-600">Ваши цели для аккаунта</h1>
 
-    <button type="submit">Сохранить изменения</button>
-</form>
-<h2>Общая сумма бюджетных планов для цели: <span th:text="${totalBudget}"></span></h2>
-<h2>Добавить новую цель</h2>
-<form th:action="@{'/goals/' + ${accountId} + '/add'}" method="post">
-    <label for="goalName">Название:</label>
-    <input type="text" id="goalName" name="goalName" required><br>
-    <label for="goalAmount">Сумма:</label>
-    <input type="number" id="goalAmount" name="goalAmount" required><br>
-    <button type="submit">Добавить цель</button>
-</form>
+    <form onsubmit="fakeUpdate(event)" class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <div class="overflow-x-auto">
+            <table class="table-auto w-full border-collapse">
+                <thead class="bg-green-100 text-green-800">
+                <tr>
+                    <th class="px-4 py-2">Название</th>
+                    <th class="px-4 py-2">Сумма</th>
+                    <th class="px-4 py-2">Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="goal : ${goals}" class="odd:bg-gray-50 even:bg-gray-100">
+                    <td class="px-4 py-2">
+                        <input type="hidden" name="goals[${goal.idGoal}].idGoal" th:value="${goal.idGoal}">
+                        <input type="text" name="goals[${goal.idGoal}].goalName" th:value="${goal.goalName}" class="border rounded px-3 py-1 w-full" required>
+                    </td>
+                    <td class="px-4 py-2">
+                        <input type="number" name="goals[${goal.idGoal}].goalAmount" th:value="${goal.goalAmount}" class="border rounded px-3 py-1 w-full" required>
+                    </td>
+                    <td class="px-4 py-2 flex space-x-2">
+                        <form th:action="@{'/goals/' + ${accountId} + '/delete'}" method="post">
+                            <input type="hidden" name="goalId" th:value="${goal.idGoal}">
+                            <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Удалить</button>
+                        </form>
+                        <a th:href="@{'/budget-plans/' + ${goal.idGoal}}" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Планы бюджета</a>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <button class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 mt-4">Сохранить изменения</button>
+    </form>
+
+    <h2 class="text-2xl font-bold mb-4 text-gray-700">Общая сумма бюджетных планов для цели:</h2>
+    <p class="text-xl font-semibold text-gray-800" th:text="${totalBudget}">0</p>
+
+    <div class="bg-white shadow-md rounded-lg p-6 mt-8">
+        <h2 class="text-2xl font-bold mb-4 text-gray-700">Добавить новую цель</h2>
+        <form th:action="@{'/goals/' + ${accountId} + '/add'}" method="post">
+            <div class="space-y-4">
+                <div>
+                    <label for="goalName" class="block text-sm font-bold text-gray-700">Название:</label>
+                    <input type="text" id="goalName" name="goalName" class="w-full border rounded px-3 py-2 focus:outline-green-500" required>
+                </div>
+                <div>
+                    <label for="goalAmount" class="block text-sm font-bold text-gray-700">Сумма:</label>
+                    <input type="number" id="goalAmount" name="goalAmount" class="w-full border rounded px-3 py-2 focus:outline-green-500" required>
+                </div>
+                <button class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 mt-4">Добавить цель</button>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>

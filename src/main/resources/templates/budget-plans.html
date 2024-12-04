@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Планы бюджета</title>
+    <title>Планы бюджета для целей</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         function validateDates(formId) {
             const form = document.getElementById(formId);
@@ -17,114 +18,111 @@
             return true;
         }
     </script>
-    <head>
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                setTimeout(() => {
-                    fetch('/notifications/mark-read', { method: 'POST' })
-                        .then(response => {
-                            if (response.ok) {
-                                location.reload(); // Перезагрузка страницы после обновления
-                            }
-                        });
-                }, 5000); // 5 секунд
-            });
-        </script>
-    </head>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            setTimeout(() => {
+                fetch('/notifications/mark-read', {method: 'POST'})
+                    .then(response => {
+                        if (response.ok) {
+                            location.reload(); // Перезагрузка страницы после обновления
+                        }
+                    });
+            }, 5000); // 5 секунд
+        });
+    </script>
 
 </head>
-<body>
-<h1>Планы бюджета для цели</h1>
+<body class="bg-gray-100 text-gray-800">
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6 text-center text-teal-600">Планы бюджета для целей</h1>
 
-<table border="1">
-    <thead>
-    <tr>
-        <th>Название</th>
-        <th>Сумма</th>
-        <th>Дата начала</th>
-        <th>Дата окончания</th>
-        <th>Действия</th>
-        <th>Сумма транзакций</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="plan : ${budgetPlans}">
-        <td>
-            <form th:action="@{'/budget-plans/' + ${goalId} + '/update'}" method="post" style="display:inline;">
-                <input type="hidden" name="idBudget" th:value="${plan.idBudget}">
-                <input type="text" name="planName" th:value="${plan.planName}" required>
-        </td>
-        <td>
-            <input type="number" name="planAmount" th:value="${plan.planAmount}" required>
-        </td>
-        <td>
-            <input type="date" name="startDate" th:value="${plan.startDate}" required>
-        </td>
-        <td>
-            <input type="date" name="endDate" th:value="${plan.endDate}" required>
-        </td>
-        <td>
-            <button type="submit">Сохранить</button>
-            </form>
-            <form th:action="@{'/budget-plans/' + ${goalId} + '/delete'}" method="post" style="display:inline;">
-                <input type="hidden" name="idBudget" th:value="${plan.idBudget}">
-                <button type="submit">Удалить</button>
-            </form>
-            <a th:href="@{'/budget-plans/' + ${goalId} + '/' + ${plan.idBudget} + '/details'}">Подробнее</a>
-        </td>
-        <td>
-            <p>Сумма транзакций: <span th:text="${transactionsTotals[plan.idBudget]}">0</span></p>
-        </td>
-    </tr>
+    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-4 text-gray-700">Список планов бюджета</h2>
+        <div class="overflow-x-auto">
+            <table class="table-auto w-full border-collapse">
+                <thead class="bg-teal-100 text-teal-800">
+                <tr>
+                    <th class="px-4 py-2">Название</th>
+                    <th class="px-4 py-2">Сумма</th>
+                    <th class="px-4 py-2">Дата начала</th>
+                    <th class="px-4 py-2">Дата окончания</th>
+                    <th class="px-4 py-2">Действия</th>
+                    <th class="px-4 py-2">Сумма транзакций</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="plan : ${budgetPlans}" class="odd:bg-gray-50 even:bg-gray-100">
+                    <td class="px-4 py-2">
+                        <form th:action="@{'/budget-plans/' + ${goalId} + '/update'}" method="post">
+                            <input type="hidden" name="idBudget" th:value="${plan.idBudget}">
+                            <input type="text" name="planName" th:value="${plan.planName}"
+                                   class="border rounded px-3 py-1 w-full" required>
+                    </td>
+                    <td class="px-4 py-2">
+                        <input type="number" name="planAmount" th:value="${plan.planAmount}"
+                               class="border rounded px-3 py-1 w-full" required>
+                    </td>
+                    <td class="px-4 py-2">
+                        <input type="date" name="startDate" th:value="${plan.startDate}"
+                               class="border rounded px-3 py-1 w-full" required>
+                    </td>
+                    <td class="px-4 py-2">
+                        <input type="date" name="endDate" th:value="${plan.endDate}"
+                               class="border rounded px-3 py-1 w-full" required>
+                    </td>
+                    <td class="px-4 py-2 flex space-x-2">
+                        <button class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Сохранить</button>
+                        </form>
+                        <form th:action="@{'/budget-plans/' + ${goalId} + '/delete'}" method="post">
+                            <input type="hidden" name="idBudget" th:value="${plan.idBudget}">
+                            <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Удалить</button>
+                        </form>
+                        <a th:href="@{'/budget-plans/' + ${goalId} + '/' + ${plan.idBudget} + '/details'}"
+                           class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">Подробнее</a>
+                    </td>
+                    <td class="px-4 py-2">
+                        <span th:text="${transactionsTotals[plan.idBudget]}">0</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-    </tbody>
+    <h2 class="text-2xl font-bold mb-4 text-gray-700">Общая сумма всех планов бюджета:</h2>
+    <p class="text-xl font-semibold text-gray-800" th:text="${totalBudget}">0</p>
 
-</table>
-<h2>Общая сумма всех планов бюджета:</h2>
-<p th:text="${totalBudget}">0</p>
-
-
-<h2>Добавить новый план бюджета</h2>
-<form th:action="@{'/budget-plans/' + ${goalId} + '/add'}" method="post" id="addForm" onsubmit="return validateDates('addForm')">
-    <label for="planName">Название:</label>
-    <input type="text" id="planName" name="planName" required><br>
-    <label for="planAmount">Сумма:</label>
-    <input type="number" id="planAmount" name="planAmount" required><br>
-    <label for="startDate">Дата начала:</label>
-    <input type="date" id="startDate" name="startDate" required><br>
-    <label for="endDate">Дата окончания:</label>
-    <input type="date" id="endDate" name="endDate" required><br>
-    <button type="submit">Добавить</button>
-</form>
-
-<h2>Уведомления</h2>
-<table>
-    <thead>
-    <tr>
-        <th>Сообщение</th>
-        <th>Дата и время</th>
-        <th>Статус</th>
-        <th>Действия</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="notification : ${notifications}">
-        <td th:text="${notification.notificationText}"></td>
-        <td th:text="${#temporals.format(notification.notificationDateTime, 'dd.MM.yyyy HH:mm')}"></td>
-        <td th:text="${notification.status}"></td>
-        <td>
-            <form th:action="@{/notifications/delete}" method="post">
-                <input type="hidden" th:value="${notification.idNotification}" name="notificationId" />
-                <input type="hidden" th:value="${goalId}" name="goalId" />
-                <button type="submit">Удалить</button>
-            </form>
-        </td>
-    </tr>
-    </tbody>
-</table>
-
-
-<a th:href="@{'/goals/' + 3}">Назад к целям</a>
-
+    <div class="bg-white shadow-md rounded-lg p-6 mt-8">
+        <h2 class="text-2xl font-bold mb-4 text-gray-700">Добавить новый план бюджета</h2>
+        <form th:action="@{'/budget-plans/' + ${goalId} + '/add'}" method="post" id="addForm"
+              onsubmit="return validateDates('addForm')">
+            <div class="space-y-4">
+                <div>
+                    <label for="planName" class="block text-sm font-bold text-gray-700">Название:</label>
+                    <input type="text" id="planName" name="planName"
+                           class="w-full border rounded px-3 py-2 focus:outline-teal-500" required>
+                </div>
+                <div>
+                    <label for="planAmount" class="block text-sm font-bold text-gray-700">Сумма:</label>
+                    <input type="number" id="planAmount" name="planAmount"
+                           class="w-full border rounded px-3 py-2 focus:outline-teal-500" required>
+                </div>
+                <div class="flex space-x-4">
+                    <div class="flex-1">
+                        <label for="startDate" class="block text-sm font-bold text-gray-700">Дата начала:</label>
+                        <input type="date" id="startDate" name="startDate"
+                               class="w-full border rounded px-3 py-2 focus:outline-teal-500" required>
+                    </div>
+                    <div class="flex-1">
+                        <label for="endDate" class="block text-sm font-bold text-gray-700">Дата окончания:</label>
+                        <input type="date" id="endDate" name="endDate"
+                               class="w-full border rounded px-3 py-2 focus:outline-teal-500" required>
+                    </div>
+                </div>
+                <button class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600 mt-4">Добавить</button>
+            </div>
+        </form>
+    </div>
+</div>
 </body>
 </html>

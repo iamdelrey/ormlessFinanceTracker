@@ -4,14 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Выбор аккаунта</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<h1>Выберите аккаунт</h1>
-<ul>
-    <li th:each="account : ${accounts}">
-        <span th:text="${account.accountName}"></span>
-        <a th:href="@{'/goals/' + ${account.idAccount}}">Посмотреть цели</a>
-    </li>
-</ul>
+<body class="bg-gray-100 text-gray-800">
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6 text-center text-teal-600">Выберите аккаунт</h1>
+    <ul class="bg-white shadow-md rounded-lg p-6 space-y-4">
+        <li th:each="account : ${accounts}" class="flex justify-between items-center border-b pb-4">
+            <span th:text="${account.accountName}" class="text-lg font-semibold text-gray-700"></span>
+            <a th:href="@{'/goals/' + ${account.idAccount}}"
+               class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Посмотреть цели</a>
+        </li>
+    </ul>
+</div>
 </body>
 </html>

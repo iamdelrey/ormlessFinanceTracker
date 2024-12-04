@@ -4,14 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Дашборд</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<h1>Добро пожаловать!</h1>
-<p>Выберите, что хотите сделать:</p>
-<ul>
-    <li><a href="/accounts">Управление аккаунтами</a></li>
-    <li><a href="/goals/accounts">Управление целями</a></li> <!-- Добавлена кнопка для управления целями -->
-    <li><a href="/logout">Выйти</a></li>
-</ul>
+<body class="bg-gray-100 text-gray-800">
+<div class="container mx-auto p-6 text-center">
+    <h1 class="text-3xl font-bold mb-6 text-blue-600">Добро пожаловать!</h1>
+    <p class="text-lg mb-4 text-gray-700">Выберите, что хотите сделать:</p>
+    <ul class="space-y-4">
+        <li>
+            <a href="/accounts" class="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">Управление аккаунтами</a>
+        </li>
+        <li>
+            <a href="/goals/accounts" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600">Управление целями</a>
+        </li>
+        <li>
+            <a href="/logout" class="bg-red-500 text-white px-6 py-2 rounded hover:bg-red-600">Выйти</a>
+        </li>
+    </ul>
+</div>
 </body>
 </html>

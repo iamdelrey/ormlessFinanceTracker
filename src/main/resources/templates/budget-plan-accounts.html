@@ -3,15 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Выбор аккаунта</title>
+    <title>Счета плана бюджета</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<h1>Выберите аккаунт для работы с планами бюджета</h1>
-<ul>
-    <li th:each="account : ${accounts}">
-        <span th:text="${account.accountName}"></span>
-        <a th:href="'/budget-plans/' + ${account.idAccount}">Посмотреть план бюджета</a>
-    </li>
-</ul>
+<body class="bg-gray-100 text-gray-800">
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6 text-center text-indigo-600">Счета плана бюджета</h1>
+    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-4 text-gray-700">Счета, связанные с планом</h2>
+        <div class="overflow-x-auto">
+            <table class="table-auto w-full border-collapse">
+                <thead class="bg-indigo-100 text-indigo-800">
+                <tr>
+                    <th class="px-4 py-2 text-left">Название счета</th>
+                    <th class="px-4 py-2 text-left">Тип</th>
+                    <th class="px-4 py-2 text-left">Баланс</th>
+                    <th class="px-4 py-2 text-left">Действия</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="account : ${accounts}" class="odd:bg-gray-50 even:bg-gray-100">
+                    <td class="px-4 py-2" th:text="${account.accountName}"></td>
+                    <td class="px-4 py-2" th:text="${account.accountType}"></td>
+                    <td class="px-4 py-2" th:text="${account.balance}"></td>
+                    <td class="px-4 py-2">
+                        <form method="post" th:action="@{'/budget-plans/accounts/remove/' + ${account.id}}" class="inline">
+                            <button class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">Удалить</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4 text-gray-700">Добавить счет в план</h2>
+        <form method="post" th:action="@{'/budget-plans/accounts/add'}" class="space-y-4">
+            <div>
+                <label for="accountName" class="block text-sm font-bold text-gray-700">Название счета:</label>
+                <input type="text" id="accountName" name="accountName" placeholder="Введите название"
+                       class="w-full border rounded px-3 py-2 focus:outline-indigo-500" required>
+            </div>
+            <div>
+                <label for="accountType" class="block text-sm font-bold text-gray-700">Тип счета:</label>
+                <input type="text" id="accountType" name="accountType" placeholder="Введите тип"
+                       class="w-full border rounded px-3 py-2 focus:outline-indigo-500" required>
+            </div>
+            <div>
+                <label for="balance" class="block text-sm font-bold text-gray-700">Баланс:</label>
+                <input type="number" id="balance" name="balance" placeholder="Введите баланс"
+                       class="w-full border rounded px-3 py-2 focus:outline-indigo-500" required>
+            </div>
+            <button class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">Добавить счет</button>
+        </form>
+    </div>
+
+    <div class="text-center mt-8">
+        <a href="/budget-plans" class="inline-block bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">Назад к планам</a>
+    </div>
+</div>
 </body>
 </html>

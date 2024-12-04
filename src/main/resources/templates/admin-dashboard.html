@@ -4,57 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Админский Дашборд</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<h1>Админский Дашборд</h1>
+<body class="bg-gray-100 text-gray-800">
+<div class="container mx-auto p-6">
+    <h1 class="text-3xl font-bold mb-6 text-center text-purple-600">Админский Дашборд</h1>
 
-<!-- Список пользователей -->
-<h2>Пользователи</h2>
-<table border="1">
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Email</th>
-        <th>Роль</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="user : ${users}">
-        <td th:text="${user.id}"></td>
-        <td th:text="${user.email}"></td>
-        <td th:text="${user.role}"></td>
-    </tr>
-    </tbody>
-</table>
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-4 text-gray-700">Пользователи</h2>
+        <div class="overflow-x-auto">
+            <table class="table-auto w-full border-collapse">
+                <thead class="bg-purple-100 text-purple-800">
+                <tr>
+                    <th class="px-4 py-2 text-left">ID</th>
+                    <th class="px-4 py-2 text-left">Email</th>
+                    <th class="px-4 py-2 text-left">Роль</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="user : ${users}" class="odd:bg-gray-50 even:bg-gray-100">
+                    <td class="px-4 py-2" th:text="${user.id}"></td>
+                    <td class="px-4 py-2" th:text="${user.email}"></td>
+                    <td class="px-4 py-2" th:text="${user.role}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 
-<!-- Форма добавления нового пользователя -->
-<h2>Добавить пользователя</h2>
-<form th:action="@{'/admin-dashboard/add-user'}" method="post">
-    <label for="name">Имя:</label>
-    <input type="text" id="name" name="name" required>
+    <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <h2 class="text-2xl font-bold mb-4 text-gray-700">Добавить пользователя</h2>
+        <form th:action="@{'/admin-dashboard/add-user'}" method="post" class="space-y-4">
+            <div>
+                <label for="name" class="block text-sm font-bold text-gray-700">Имя:</label>
+                <input type="text" id="name" name="name" placeholder="Имя"
+                       class="w-full border rounded px-3 py-2 focus:outline-purple-500" required>
+            </div>
+            <div>
+                <label for="surname" class="block text-sm font-bold text-gray-700">Фамилия:</label>
+                <input type="text" id="surname" name="surname" placeholder="Фамилия"
+                       class="w-full border rounded px-3 py-2 focus:outline-purple-500" required>
+            </div>
+            <div>
+                <label for="email" class="block text-sm font-bold text-gray-700">Email:</label>
+                <input type="email" id="email" name="email" placeholder="example@domain.com"
+                       class="w-full border rounded px-3 py-2 focus:outline-purple-500" required>
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-bold text-gray-700">Пароль:</label>
+                <input type="password" id="password" name="password" placeholder="Введите пароль"
+                       class="w-full border rounded px-3 py-2 focus:outline-purple-500" required>
+            </div>
+            <button class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">Добавить</button>
+        </form>
+    </div>
 
-    <label for="surname">Фамилия:</label>
-    <input type="text" id="surname" name="surname" required>
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <h2 class="text-2xl font-bold mb-4 text-gray-700">Удалить пользователя</h2>
+        <form th:action="@{'/admin-dashboard/delete-user'}" method="post" class="space-y-4">
+            <div>
+                <label for="userId" class="block text-sm font-bold text-gray-700">ID пользователя:</label>
+                <input type="number" id="userId" name="userId" placeholder="Введите ID"
+                       class="w-full border rounded px-3 py-2 focus:outline-purple-500" required>
+            </div>
+            <button class="w-full bg-red-500 text-white py-2 rounded hover:bg-red-600">Удалить</button>
+        </form>
+    </div>
 
-    <label for="email">Email:</label>
-    <input type="email" id="email" name="email" required>
-
-    <label for="password">Пароль:</label>
-    <input type="password" id="password" name="password" required>
-
-    <button type="submit">Добавить</button>
-</form>
-
-
-<!-- Кнопка удаления пользователя -->
-<h2>Удалить пользователя</h2>
-<form th:action="@{/admin-dashboard/delete-user}" method="post">
-    <label for="userId">ID пользователя:</label>
-    <input type="number" id="userId" name="userId" required>
-    <button type="submit">Удалить</button>
-</form>
-
-
-<a href="/">На главную</a>
+    <div class="text-center mt-8">
+        <a href="/" class="inline-block bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600">На главную</a>
+    </div>
+</div>
 </body>
 </html>

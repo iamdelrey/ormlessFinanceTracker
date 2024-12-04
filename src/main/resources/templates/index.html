@@ -1,16 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Главная страница</title>
-    <link rel="stylesheet" href="/static/styles.css">
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<div style="text-align: center; margin-top: 50px;">
-    <h1>Добро пожаловать в финансовый трекер</h1>
-    <button onclick="location.href='/login'" style="margin-right: 10px; padding: 10px 20px;">Войти</button>
-    <button onclick="location.href='/register'" style="padding: 10px 20px;">Зарегистрироваться</button>
+<body class="bg-gray-100 text-gray-800">
+<div class="container mx-auto p-6 text-center">
+    <h1 class="text-4xl font-bold mb-6 text-blue-600">Добро пожаловать в финансовый трекер</h1>
+    <p class="text-lg text-gray-700 mb-8">Управляйте своими финансами легко и эффективно</p>
+    <div class="flex justify-center space-x-4">
+        <button onclick="location.href='/login'" class="bg-blue-500 text-white px-6 py-3 rounded hover:bg-blue-600">Войти</button>
+        <button onclick="location.href='/register'" class="bg-green-500 text-white px-6 py-3 rounded hover:bg-green-600">Зарегистрироваться</button>
+    </div>
 </div>
 </body>
 </html>

@@ -1,40 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Регистрация</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-<div style="text-align: center; margin-top: 50px;">
-    <h1>Регистрация</h1>
-    <!-- Сообщение об успешной регистрации -->
-    <div style="color: green; margin-bottom: 20px;" th:if="${success}">
-        <p th:utext="${success}"></p> <!-- Используем th:utext для отображения HTML -->
+<body class="bg-gray-100 text-gray-800">
+<div class="container mx-auto p-6 flex justify-center items-center min-h-screen">
+    <div class="bg-white shadow-md rounded-lg p-8 max-w-md w-full">
+        <h1 class="text-3xl font-bold mb-6 text-center text-green-600">Регистрация</h1>
+        <div th:if="${success}" class="text-green-600 text-center mb-4">
+            <p th:utext="${success}"></p>
+        </div>
+        <div th:if="${error}" class="text-red-600 text-center mb-4">
+            <p th:text="${error}"></p>
+        </div>
+        <form method="post" action="/api/auth/register" class="space-y-4">
+            <div>
+                <label for="name" class="block text-sm font-bold text-gray-700">Имя:</label>
+                <input type="text" id="name" name="name" placeholder="Введите имя"
+                       class="w-full border rounded px-3 py-2 focus:outline-green-500" required>
+            </div>
+            <div>
+                <label for="surname" class="block text-sm font-bold text-gray-700">Фамилия:</label>
+                <input type="text" id="surname" name="surname" placeholder="Введите фамилию"
+                       class="w-full border rounded px-3 py-2 focus:outline-green-500" required>
+            </div>
+            <div>
+                <label for="email" class="block text-sm font-bold text-gray-700">Email:</label>
+                <input type="email" id="email" name="email" placeholder="Введите email"
+                       class="w-full border rounded px-3 py-2 focus:outline-green-500" required>
+            </div>
+            <div>
+                <label for="password" class="block text-sm font-bold text-gray-700">Пароль:</label>
+                <input type="password" id="password" name="password" placeholder="Введите пароль"
+                       class="w-full border rounded px-3 py-2 focus:outline-green-500" required>
+            </div>
+            <button type="submit" class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">Зарегистрироваться</button>
+        </form>
     </div>
-    <!-- Сообщение об ошибке -->
-    <div style="color: red; margin-bottom: 20px;" th:if="${error}">
-        <p th:text="${error}"></p>
-    </div>
-    <form method="post" action="/api/auth/register">
-        <div>
-            <label for="name">Имя:</label>
-            <input type="text" id="name" name="name" required>
-        </div>
-        <div>
-            <label for="surname">Фамилия:</label>
-            <input type="text" id="surname" name="surname" required>
-        </div>
-        <div>
-            <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
-        </div>
-        <div>
-            <label for="password">Пароль:</label>
-            <input type="password" id="password" name="password" required>
-        </div>
-        <button type="submit">Зарегистрироваться</button>
-    </form>
 </div>
 </body>
 </html>
