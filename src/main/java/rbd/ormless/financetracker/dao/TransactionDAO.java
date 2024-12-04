@@ -34,6 +34,26 @@ public class TransactionDAO {
                 transaction.getDescription(), transaction.getIdBudget(), transaction.getIdGoal());
     }
 
+//    public List<Transaction> findByCategoryAndAmountRange(String category, BigDecimal minAmount, BigDecimal maxAmount) {
+//        String sql = "SELECT * FROM \"Transaction\" WHERE category = ? AND amount BETWEEN ? AND ?";
+//        return jdbcTemplate.query(sql, new Object[]{category, minAmount, maxAmount}, this::mapRowToTransaction);
+//    }
+
+    public List<Transaction> findByCategoryAndAmountRange(String category, BigDecimal minAmount, BigDecimal maxAmount) {
+        String sql;
+        Object[] params;
+
+        if (category != null) {
+            sql = "SELECT * FROM \"Transaction\" WHERE category = ? AND amount BETWEEN ? AND ?";
+            params = new Object[]{category, minAmount, maxAmount};
+        } else {
+            sql = "SELECT * FROM \"Transaction\" WHERE amount BETWEEN ? AND ?";
+            params = new Object[]{minAmount, maxAmount};
+        }
+
+        return jdbcTemplate.query(sql, params, this::mapRowToTransaction);
+    }
+
     public void updateTransaction(Transaction transaction) {
         String sql = "UPDATE \"Transaction\" SET amount = ?, date_time = ?, transaction_type = ?, category = ?, description = ? " +
                 "WHERE id_transaction = ? AND id_user = ?";
@@ -62,6 +82,11 @@ public class TransactionDAO {
         return jdbcTemplate.queryForObject(sql, new Object[]{userId}, BigDecimal.class);
     }
 
+    public List<Transaction> findByTypeAndAmountRange(String transactionType, BigDecimal minAmount, BigDecimal maxAmount) {
+        String sql = "SELECT * FROM \"Transaction\" WHERE transaction_type = ? AND amount BETWEEN ? AND ?";
+        return jdbcTemplate.query(sql, new Object[]{transactionType, minAmount, maxAmount}, this::mapRowToTransaction);
+    }
+
     public void markAllAsReadForUser(int userId) {
         String sql = "UPDATE \"Notification\" SET status = 'Прочитано' WHERE status = 'Непрочитано' AND id_user = ?";
         jdbcTemplate.update(sql, userId);
@@ -81,5 +106,4 @@ public class TransactionDAO {
         transaction.setIdGoal(rs.getInt("id_goal"));
         return transaction;
     }
-
 }

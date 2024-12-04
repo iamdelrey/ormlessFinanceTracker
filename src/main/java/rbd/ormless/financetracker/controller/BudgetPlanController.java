@@ -179,11 +179,91 @@ public class BudgetPlanController {
         return "redirect:/budget-plans/" + goalId + "/" + idBudget + "/details";
     }
 
+//    @GetMapping("/{goalId}/{idBudget}/search-transactions")
+//    public String searchTransactions(@PathVariable int goalId,
+//                                     @PathVariable int idBudget,
+//                                     @RequestParam String category,
+//                                     @RequestParam BigDecimal minAmount,
+//                                     @RequestParam BigDecimal maxAmount,
+//                                     Model model) {
+//        List<Transaction> transactions = transactionService.getTransactionsByCategoryAndAmount(category, minAmount, maxAmount);
+//
+//        model.addAttribute("transactions", transactions);
+//        model.addAttribute("goalId", goalId);
+//        model.addAttribute("idBudget", idBudget);
+//        return "transactions";
+//    }
+
+    @GetMapping("/{goalId}/{idBudget}/search-transactions")
+    public String searchTransactions(@PathVariable int goalId,
+                                     @PathVariable int idBudget,
+                                     @RequestParam(required = false) String category,
+                                     @RequestParam(required = false) BigDecimal minAmount,
+                                     @RequestParam(required = false) BigDecimal maxAmount,
+                                     Model model) {
+        // Проверка на null или пустое значение для необязательных параметров
+        if (minAmount == null) {
+            minAmount = BigDecimal.ZERO; // Устанавливаем минимальное значение по умолчанию
+        }
+        if (maxAmount == null) {
+            maxAmount = BigDecimal.valueOf(Double.MAX_VALUE); // Максимальное значение по умолчанию
+        }
+
+        // Логика поиска
+        List<Transaction> transactions = transactionService.getTransactionsByCategoryAndAmount(
+                category != null && !category.isEmpty() ? category : null,
+                minAmount,
+                maxAmount
+        );
+
+        model.addAttribute("transactions", transactions);
+        model.addAttribute("goalId", goalId);
+        model.addAttribute("idBudget", idBudget);
+        return "transactions";
+    }
+    @GetMapping("/{goalId}/{idBudget}/{idCategory}/search")
+    public String searchTransactions(@PathVariable int goalId,
+                                     @PathVariable int idBudget,
+                                     @PathVariable int idCategory,
+                                     @RequestParam String transactionType,
+                                     @RequestParam(required = false) BigDecimal minAmount,
+                                     @RequestParam(required = false) BigDecimal maxAmount,
+                                     Model model) {
+        // Устанавливаем значения по умолчанию для диапазона суммы, если они отсутствуют
+        if (minAmount == null) {
+            minAmount = BigDecimal.ZERO;
+        }
+        if (maxAmount == null) {
+            maxAmount = BigDecimal.valueOf(Double.MAX_VALUE);
+        }
+
+        // Получение результатов поиска
+        List<Transaction> transactions = transactionService.getTransactionsByTypeAndAmount(transactionType, minAmount, maxAmount);
+
+        BigDecimal totalTransactions = transactions.stream()
+                .map(Transaction::getAmount)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        model.addAttribute("transactions", transactions);
+        model.addAttribute("totalTransactions", totalTransactions);
+        model.addAttribute("goalId", goalId);
+        model.addAttribute("idBudget", idBudget);
+        model.addAttribute("idCategory", idCategory);
+        model.addAttribute("transactionType", transactionType);
+        model.addAttribute("minAmount", minAmount);
+        model.addAttribute("maxAmount", maxAmount);
+
+        return "transactions";
+    }
+
+
     @GetMapping("/{goalId}/{idBudget}/{idCategory}/transactions")
-    public String listTransactions(@PathVariable int goalId, @PathVariable int idBudget,
-                                   @PathVariable int idCategory, Model model) {
+    public String listTransactions(@PathVariable int goalId,
+                                   @PathVariable int idBudget,
+                                   @PathVariable int idCategory,
+                                   Model model) {
         String categoryName = categoryService.getCategoryNameById(idCategory);
-        List<Transaction> transactions = transactionService.getTransactionsByBudgetId(idBudget);
+        List<Transaction> transactions = transactionService.getTransactionsByCategoryId(categoryName);
 
         BigDecimal totalTransactions = transactions.stream()
                 .map(Transaction::getAmount)
@@ -199,12 +279,13 @@ public class BudgetPlanController {
         model.addAttribute("goalId", goalId);
         model.addAttribute("idBudget", idBudget);
         model.addAttribute("idCategory", idCategory);
+        model.addAttribute("transactionType", ""); // Добавлено
         return "transactions";
     }
 
-
     @PostMapping("/{goalId}/{idBudget}/{idCategory}/add-transaction")
-    public String addTransaction(@PathVariable int goalId, @PathVariable int idBudget,
+    public String addTransaction(@PathVariable int goalId,
+                                 @PathVariable int idBudget,
                                  @PathVariable int idCategory,
                                  @ModelAttribute Transaction transaction,
                                  @RequestParam String dateTime,

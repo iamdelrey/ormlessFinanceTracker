@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Админский Дашборд</title>
+</head>
+<body>
+<h1>Админский Дашборд</h1>
+
+<!-- Список пользователей -->
+<h2>Пользователи</h2>
+<table border="1">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Email</th>
+        <th>Роль</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="user : ${users}">
+        <td th:text="${user.id}"></td>
+        <td th:text="${user.email}"></td>
+        <td th:text="${user.role}"></td>
+    </tr>
+    </tbody>
+</table>
+
+<!-- Форма добавления нового пользователя -->
+<h2>Добавить пользователя</h2>
+<form th:action="@{'/admin-dashboard/add-user'}" method="post">
+    <label for="name">Имя:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="surname">Фамилия:</label>
+    <input type="text" id="surname" name="surname" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required>
+
+    <label for="password">Пароль:</label>
+    <input type="password" id="password" name="password" required>
+
+    <button type="submit">Добавить</button>
+</form>
+
+
+<!-- Кнопка удаления пользователя -->
+<h2>Удалить пользователя</h2>
+<form th:action="@{/admin-dashboard/delete-user}" method="post">
+    <label for="userId">ID пользователя:</label>
+    <input type="number" id="userId" name="userId" required>
+    <button type="submit">Удалить</button>
+</form>
+
+
+<a href="/">На главную</a>
+</body>
+</html>

@@ -7,6 +7,24 @@
 </head>
 <body>
 <h1>Транзакции</h1>
+<h3>Поиск по типу транзакции и диапазону суммы</h3>
+<form th:action="@{'/budget-plans/' + ${goalId} + '/' + ${idBudget} + '/' + ${idCategory} + '/search'}" method="get">
+    <label for="transactionType">Тип транзакции:</label>
+    <select id="transactionType" name="transactionType" required>
+        <option value="Доход">Доход</option>
+        <option value="Расход">Расход</option>
+    </select>
+
+    <label for="minAmount">Минимальная сумма:</label>
+    <input type="number" id="minAmount" name="minAmount" placeholder="Минимум" step="0.01">
+
+    <label for="maxAmount">Максимальная сумма:</label>
+    <input type="number" id="maxAmount" name="maxAmount" placeholder="Максимум" step="0.01">
+
+    <button type="submit">Искать</button>
+</form>
+
+
 
 <!-- Таблица для отображения транзакций -->
 <table border="1">
@@ -16,6 +34,7 @@
         <th>Сумма</th>
         <th>Дата</th>
         <th>Тип</th>
+        <th>Категория</th>
         <th>Действия</th>
     </tr>
     </thead>
@@ -25,6 +44,7 @@
         <td th:text="${transaction.amount}"></td>
         <td th:text="${transaction.dateTime}"></td>
         <td th:text="${transaction.transactionType}"></td>
+        <td th:text="${transaction.category}"></td>
         <td>
             <!-- Форма для обновления транзакции -->
             <form th:action="@{'/budget-plans/' + ${goalId} + '/' + ${idBudget} + '/' + ${idCategory} + '/update-transaction'}" method="post" style="display:inline;">
